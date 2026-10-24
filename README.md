@@ -1,5 +1,13 @@
 # 🛡️ PhishGuard: Intelligent Phishing & Threat Intelligence Analysis Suite
 
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)
+[![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/iamvishalpal/PhishGuard)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
+[![Status](https://img.shields.io/badge/Status-Live%20Online-success)](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)
+
+> 🌐 **Live Web Application:** [https://iamvishalpal-phishguard-app-hueeni.streamlit.app/](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)  
+> Access and test the threat intelligence suite directly in your browser without local installation.
+
 **IBM SkillsBuild Cyber Security Bootcamp (October 2026) | Conducted by BharatCares**  
 **Student:** Vishal Pal ([vishalpal9868@gmail.com](mailto:vishalpal9868@gmail.com))  
 *A multi-vector heuristic detection engine and security analyst dashboard for identifying phishing URLs, lookalike domains, and social-engineering email campaigns.*
@@ -66,7 +74,7 @@ Phishing remains the **#1 initial access vector** in cyber incidents globally (a
 |  - Real-time Threat Badges & Indicator Explanations         |
 |  - Downloadable Incident Analysis Report (.txt)             |
 |  - Interactive Employee Awareness Quiz                      |
-+-------------------------------------------------------------+
++------------------------------+------------------------------+
 ```
 
 ---
@@ -95,27 +103,52 @@ The engine evaluates visual character replacements (e.g. `0` $\rightarrow$ `o`, 
 
 ---
 
-## 🚀 5. How to Run the Project
+## 🚀 5. How to Run the Project Locally
 
-### Prerequisites
-Make sure Python (3.9+) is installed.
+### 🌐 Option A: Instant Access (No Installation Required)
+You can directly use the deployed cloud application in your browser:  
+👉 **[Open Live PhishGuard Web App](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)**
 
-### Step 1: Open Terminal in Project Directory
+---
+
+### 💻 Option B: Run Locally on Any Machine
+
+#### Prerequisites
+- **Git:** Installed on your system ([Download Git](https://git-scm.com/))
+- **Python:** Version 3.9 or newer ([Download Python](https://www.python.org/downloads/))
+
+#### Step 1: Clone the Repository
+Open your terminal or command prompt and clone the repository:
 ```bash
-cd "c:\Web Development\Random Projects\PhishGuard"
+git clone https://github.com/iamvishalpal/PhishGuard.git
+cd PhishGuard
 ```
 
-### Step 2: Install Dependencies
+#### Step 2: (Recommended) Set Up a Virtual Environment
+- **On Windows (PowerShell / Command Prompt):**
+  ```powershell
+  python -m venv venv
+  .\venv\Scripts\activate
+  ```
+- **On macOS / Linux:**
+  ```bash
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+
+#### Step 3: Install Required Dependencies
 ```bash
 pip install -r requirements.txt
 ```
-*(Dependencies are minimal: `streamlit` and `pandas`)*
+*(Dependencies are lightweight: `streamlit` and `pandas`)*
 
-### Step 3: Launch the Application
+#### Step 4: Launch the Application
 ```bash
 streamlit run app.py
 ```
-The browser will automatically open at `http://localhost:8501`.
+
+The application will launch and automatically open in your default web browser at:  
+`http://localhost:8501`
 
 ---
 
@@ -149,11 +182,12 @@ The browser will automatically open at `http://localhost:8501`.
 ## 🛡️ 8. Project Structure
 ```
 PhishGuard/
+├── .devcontainer/                           # VS Code Dev Container environment config
+│   └── devcontainer.json
 ├── app.py                                   # Standalone application: all detection algorithms & UI
 ├── requirements.txt                         # Project dependencies (streamlit, pandas)
 ├── PhishGuard_Project_Report_Vishal_Pal.docx# Full academic Word report with graphs & proofs
-├── README.md                                # Project documentation & summary
-├── presentation_notes.md                    # Viva presentation script & exam questions guide
+├── README.md                                # Project documentation & quickstart guide
 └── assets/                                  # High-resolution benchmark charts & visual graphs
     ├── threat_score_benchmark.png
     ├── shannon_entropy_curve.png
@@ -162,11 +196,12 @@ PhishGuard/
 
 ---
 
-## 📜 8. Author & Academic Information
+## 📜 9. Author & Academic Information
 - **Student Name:** Vishal Pal  
 - **Email:** [vishalpal9868@gmail.com](mailto:vishalpal9868@gmail.com)  
 - **Program:** IBM SkillsBuild Cyber Security Bootcamp (October 2026)  
 - **Conducted by:** BharatCares  
+- **Live Demo:** [https://iamvishalpal-phishguard-app-hueeni.streamlit.app/](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)  
 - **Project Category:** Defensive Cyber Operations & Threat Intelligence Suite  
-- **Submission:** Single Standalone Python File (`app.py`) + Full Academic Project Documentation  
+- **Submission:** Single Standalone Python File (`app.py`) + Full Academic Project Documentation
 
