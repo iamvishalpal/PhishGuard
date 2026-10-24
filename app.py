@@ -156,7 +156,7 @@ def extract_domain_parts(url: str):
     }
 
 
-def analyze_url(raw_url: str) -> dict:
+def analyze_url(raw_url: str, sensitivity: str = "Standard") -> dict:
     """
     Multi-factor static & heuristic analyzer for URLs.
     Evaluates protocol security, IP hosting, TLD reputation, brand mimicry,
@@ -335,14 +335,20 @@ def analyze_url(raw_url: str) -> dict:
         })
 
     # 12. Shannon Entropy (DGA Detection)
+    entropy_threshold = 3.8
+    if sensitivity == "Aggressive":
+        entropy_threshold = 3.5
+    elif sensitivity == "Paranoid":
+        entropy_threshold = 3.2
+
     entropy_val = calculate_entropy(host)
-    if entropy_val >= 3.8 and not is_ip_address(host):
+    if entropy_val >= entropy_threshold and not is_ip_address(host):
         risk_points += 15
         flags.append({
             "category": "Algorithmic Anomaly",
             "severity": "Medium",
             "title": f"High Domain Entropy ({entropy_val} bits/char)",
-            "description": "High mathematical randomness indicates an algorithmically generated domain (DGA) used by botnets or automated phishing kits.",
+            "description": f"High mathematical randomness (threshold: {entropy_threshold} bits/char) indicates an algorithmically generated domain (DGA) used by botnets or automated phishing kits.",
             "points": 15
         })
 
@@ -396,7 +402,7 @@ def analyze_url(raw_url: str) -> dict:
     }
 
 
-def analyze_email(subject: str, sender: str, body: str) -> dict:
+def analyze_email(subject: str, sender: str, body: str, sensitivity: str = "Standard") -> dict:
     """
     Social engineering & phishing inspector for email messages and headers.
     Checks sender spoofing, artificial urgency, financial extortion, and embedded links.
@@ -752,7 +758,7 @@ st.set_page_config(
     page_title="PhishGuard - Threat Intelligence Suite",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown(
@@ -898,29 +904,34 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ── Sidebar Quick Controls & Project Info ─────────────────────────────────────
-with st.sidebar:
-    st.markdown("### ⚙️ Engine Controls")
-    sensitivity = st.select_slider(
-        "Heuristic Sensitivity",
-        options=["Standard", "Aggressive", "Paranoid"],
-        value="Standard",
-        help="Controls algorithmic thresholds for entropy and keyword clustering."
-    )
+# ── Collapsible Engine Settings & Project Intel ───────────────────────────────
+with st.expander("⚙️ Engine Controls & Academic Project Intel (Click to Expand)", expanded=False):
+    col_ctl, col_info, col_diff = st.columns([1.2, 1, 1.8])
+    with col_ctl:
+        st.markdown("##### ⚙️ Engine Sensitivity")
+        sensitivity = st.select_slider(
+            "Detection Threshold:",
+            options=["Standard", "Aggressive", "Paranoid"],
+            value=st.session_state.get("sensitivity_mode", "Standard"),
+            key="sensitivity_mode",
+            help="Standard: baseline thresholds | Aggressive: tighter entropy & keyword clustering | Paranoid: zero-tolerance inspection."
+        )
+        st.caption(f"Active Mode: **{sensitivity}**")
+    with col_info:
+        st.markdown("##### 🎓 Project Information")
+        st.markdown("**Domain:** Cybersecurity & Threat Analysis")
+        st.markdown("**Scope:** Anti-Phishing & Social Engineering")
+        st.markdown("**Status:** Ready for Examination")
+    with col_diff:
+        st.markdown("##### 📌 Core Differentiation")
+        st.caption(
+            "Unlike basic login failure log counters, PhishGuard inspects live URLs, "
+            "calculates Shannon entropy mathematics, detects visual homoglyph/typosquatting, "
+            "parses email psychological coercion triggers, and generates SOC remediation reports."
+        )
 
-    st.divider()
-    st.markdown("### 🎓 Project Information")
-    st.markdown("**Domain:** Cybersecurity & Threat Analysis")
-    st.markdown("**Scope:** Anti-Phishing & Social Engineering")
-    st.markdown("**Status:** Ready for Examination")
-
-    st.divider()
-    st.markdown("### 📌 Why this is different:")
-    st.caption(
-        "Unlike basic login failure log counters, PhishGuard inspects live URLs, "
-        "calculates Shannon entropy, detects homoglyph/typosquatting, parses email "
-        "psychological manipulation triggers, and generates SOC remediation reports."
-    )
+# Fallback sensitivity if expander not interacted with
+sensitivity = st.session_state.get("sensitivity_mode", "Standard")
 
 # ── Main Tab Navigation ───────────────────────────────────────────────────────
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
@@ -939,26 +950,55 @@ with tab1:
     st.subheader("🌐 Heuristic URL & Domain Security Scanner")
     st.caption("Inspect any URL or test one of the pre-loaded real-world attack vectors below.")
 
-    # Quick demo buttons
-    demo_cols = st.columns(4)
-    if demo_cols[0].button("🚨 Test PayPal Phish", use_container_width=True):
-        st.session_state["input_url"] = SAMPLE_URLS[0]["url"]
-    if demo_cols[1].button("🚨 Test Homoglyph .xyz", use_container_width=True):
-        st.session_state["input_url"] = SAMPLE_URLS[1]["url"]
-    if demo_cols[2].button("🚨 Test Subdomain Camouflage", use_container_width=True):
-        st.session_state["input_url"] = SAMPLE_URLS[2]["url"]
-    if demo_cols[3].button("✅ Test Official PayPal", use_container_width=True):
-        st.session_state["input_url"] = SAMPLE_URLS[4]["url"]
+    # Initialize scanner_input in session_state if not already present
+    if "scanner_input" not in st.session_state:
+        st.session_state["scanner_input"] = SAMPLE_URLS[1]["url"]
 
-    # Input Box
-    default_url = st.session_state.get("input_url", "https://security-update-micros0ft.support-verify.xyz/login.html")
-    url_to_scan = st.text_input("Enter URL to analyze:", value=default_url, key="scanner_input")
+    st.markdown("**⚡ Pre-loaded Attack Scenarios (Click to load & analyze immediately):**")
+    demo_cols = st.columns(4)
+    if demo_cols[0].button("🚨 PayPal Phish (Direct IP)", use_container_width=True):
+        st.session_state["scanner_input"] = SAMPLE_URLS[0]["url"]
+        st.rerun()
+    if demo_cols[1].button("🚨 Microsoft Homoglyph .xyz", use_container_width=True):
+        st.session_state["scanner_input"] = SAMPLE_URLS[1]["url"]
+        st.rerun()
+    if demo_cols[2].button("🚨 Subdomain Camouflage", use_container_width=True):
+        st.session_state["scanner_input"] = SAMPLE_URLS[2]["url"]
+        st.rerun()
+    if demo_cols[3].button("✅ Official PayPal (Clean)", use_container_width=True):
+        st.session_state["scanner_input"] = SAMPLE_URLS[4]["url"]
+        st.rerun()
+
+    # Dropdown for full library of sample URLs
+    sample_options = ["-- Choose from all benchmark test URLs --"] + [
+        f"{s['type'].upper()}: {s['name']}  ({s['url']})" for s in SAMPLE_URLS
+    ]
+    selected_sample = st.selectbox(
+        "Or choose from full library of benchmark test URLs:",
+        options=sample_options,
+        index=0,
+        label_visibility="collapsed"
+    )
+    if selected_sample != "-- Choose from all benchmark test URLs --":
+        for s in SAMPLE_URLS:
+            if s["url"] in selected_sample:
+                if st.session_state.get("scanner_input") != s["url"]:
+                    st.session_state["scanner_input"] = s["url"]
+                    st.rerun()
+                break
+
+    # Input Box bound to scanner_input key
+    url_to_scan = st.text_input(
+        "Enter URL to analyze:",
+        key="scanner_input",
+        placeholder="https://security-update-micros0ft.support-verify.xyz/login.html"
+    )
 
     col_btn, col_blank = st.columns([1, 4])
     scan_clicked = col_btn.button("🔍 Scan Target", type="primary", use_container_width=True)
 
-    if url_to_scan:
-        result = analyze_url(url_to_scan)
+    if url_to_scan and url_to_scan.strip():
+        result = analyze_url(url_to_scan.strip(), sensitivity=sensitivity)
 
         if "error" in result:
             st.error(result["error"])
@@ -1179,120 +1219,154 @@ with tab2:
     st.subheader("✉️ Social Engineering & Email Threat Analyzer")
     st.caption("Inspect suspicious emails for sender spoofing, urgency traps, financial coercion, and hidden links.")
 
-    st.markdown("**Load Real-World Attack Scenarios:**")
+    # Initialize email inputs in session state if not present
+    if "email_sender_input" not in st.session_state:
+        st.session_state["email_sender_input"] = SAMPLE_EMAILS[0]["sender"]
+    if "email_subject_input" not in st.session_state:
+        st.session_state["email_subject_input"] = SAMPLE_EMAILS[0]["subject"]
+    if "email_body_input" not in st.session_state:
+        st.session_state["email_body_input"] = SAMPLE_EMAILS[0]["body"]
+
+    st.markdown("**⚡ Pre-loaded Attack Scenarios (Click to load & analyze immediately):**")
     email_demo_cols = st.columns(4)
-    if email_demo_cols[0].button("🚨 Fake PayPal Urgent Notice", use_container_width=True):
-        st.session_state["email_subject"] = SAMPLE_EMAILS[0]["subject"]
-        st.session_state["email_sender"] = SAMPLE_EMAILS[0]["sender"]
-        st.session_state["email_body"] = SAMPLE_EMAILS[0]["body"]
+    if email_demo_cols[0].button("🚨 Fake PayPal Notice", use_container_width=True):
+        st.session_state["email_sender_input"] = SAMPLE_EMAILS[0]["sender"]
+        st.session_state["email_subject_input"] = SAMPLE_EMAILS[0]["subject"]
+        st.session_state["email_body_input"] = SAMPLE_EMAILS[0]["body"]
+        st.rerun()
     if email_demo_cols[1].button("🚨 CEO Wire Fraud (BEC)", use_container_width=True):
-        st.session_state["email_subject"] = SAMPLE_EMAILS[1]["subject"]
-        st.session_state["email_sender"] = SAMPLE_EMAILS[1]["sender"]
-        st.session_state["email_body"] = SAMPLE_EMAILS[1]["body"]
+        st.session_state["email_sender_input"] = SAMPLE_EMAILS[1]["sender"]
+        st.session_state["email_subject_input"] = SAMPLE_EMAILS[1]["subject"]
+        st.session_state["email_body_input"] = SAMPLE_EMAILS[1]["body"]
+        st.rerun()
     if email_demo_cols[2].button("🚨 DHL Failed Delivery", use_container_width=True):
-        st.session_state["email_subject"] = SAMPLE_EMAILS[2]["subject"]
-        st.session_state["email_sender"] = SAMPLE_EMAILS[2]["sender"]
-        st.session_state["email_body"] = SAMPLE_EMAILS[2]["body"]
+        st.session_state["email_sender_input"] = SAMPLE_EMAILS[2]["sender"]
+        st.session_state["email_subject_input"] = SAMPLE_EMAILS[2]["subject"]
+        st.session_state["email_body_input"] = SAMPLE_EMAILS[2]["body"]
+        st.rerun()
     if email_demo_cols[3].button("✅ Legitimate Google Alert", use_container_width=True):
-        st.session_state["email_subject"] = SAMPLE_EMAILS[3]["subject"]
-        st.session_state["email_sender"] = SAMPLE_EMAILS[3]["sender"]
-        st.session_state["email_body"] = SAMPLE_EMAILS[3]["body"]
+        st.session_state["email_sender_input"] = SAMPLE_EMAILS[3]["sender"]
+        st.session_state["email_subject_input"] = SAMPLE_EMAILS[3]["subject"]
+        st.session_state["email_body_input"] = SAMPLE_EMAILS[3]["body"]
+        st.rerun()
+
+    # Dropdown for full library of email scenarios
+    email_sample_options = ["-- Choose from all email attack scenarios --"] + [
+        f"{s['name']} - {s['subject'][:55]}..." for s in SAMPLE_EMAILS
+    ]
+    selected_email_sample = st.selectbox(
+        "Or choose from full library of email scenarios:",
+        options=email_sample_options,
+        index=0,
+        label_visibility="collapsed"
+    )
+    if selected_email_sample != "-- Choose from all email attack scenarios --":
+        for s in SAMPLE_EMAILS:
+            if s["name"] in selected_email_sample:
+                if st.session_state.get("email_subject_input") != s["subject"]:
+                    st.session_state["email_sender_input"] = s["sender"]
+                    st.session_state["email_subject_input"] = s["subject"]
+                    st.session_state["email_body_input"] = s["body"]
+                    st.rerun()
+                break
 
     col_sender, col_subj = st.columns([1, 1])
     with col_sender:
         sender_val = st.text_input(
             "Sender (Display Name + Email):",
-            value=st.session_state.get("email_sender", SAMPLE_EMAILS[0]["sender"]),
+            key="email_sender_input",
             placeholder="e.g. PayPal Support <service@paypa1-security.xyz>"
         )
     with col_subj:
         subject_val = st.text_input(
             "Email Subject Line:",
-            value=st.session_state.get("email_subject", SAMPLE_EMAILS[0]["subject"]),
+            key="email_subject_input",
             placeholder="e.g. Urgent: Account suspended within 24 hours"
         )
 
     body_val = st.text_area(
         "Email Body Text:",
-        value=st.session_state.get("email_body", SAMPLE_EMAILS[0]["body"]),
+        key="email_body_input",
         height=200,
         placeholder="Paste full email text here..."
     )
 
-    if st.button("🔍 Analyze Email Threat", type="primary"):
-        if not body_val.strip() and not subject_val.strip():
-            st.warning("Please provide email text or subject to analyze.")
-        else:
-            email_res = analyze_email(subject_val, sender_val, body_val)
-            e_score = email_res["score"]
-            verdict = email_res["verdict"]
-            badge_color = email_res["badge_color"]
+    col_em_btn, col_em_blank = st.columns([1, 4])
+    analyze_email_btn = col_em_btn.button("🔍 Analyze Email Threat", type="primary", use_container_width=True)
 
-            st.write("")
-            st.markdown(
-                f"""
-                <div class="score-box" style="border-color: {badge_color}; background: radial-gradient(circle, {badge_color}22 0%, #161b22 100%);">
-                    <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: #8b949e;">
-                        Social Engineering Risk Score
-                    </div>
-                    <div style="font-size: 3.5rem; font-weight: 800; color: {badge_color}; margin: 0.2rem 0;">
-                        {e_score} <span style="font-size: 1.5rem; color: #8b949e;">/ 100</span>
-                    </div>
-                    <div style="font-size: 1.25rem; font-weight: 600; color: #c9d1d9;">
-                        Assessment: <span style="color: {badge_color};">{verdict}</span>
-                    </div>
-                    <div style="font-size: 0.9rem; color: #8b949e; margin-top: 0.5rem;">
-                        {email_res['summary']}
-                    </div>
+    if (body_val and body_val.strip()) or (subject_val and subject_val.strip()):
+        email_res = analyze_email(subject_val, sender_val, body_val, sensitivity=sensitivity)
+        e_score = email_res["score"]
+        verdict = email_res["verdict"]
+        badge_color = email_res["badge_color"]
+
+        st.write("")
+        st.markdown(
+            f"""
+            <div class="score-box" style="border-color: {badge_color}; background: radial-gradient(circle, {badge_color}22 0%, #161b22 100%);">
+                <div style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: #8b949e;">
+                    Social Engineering Risk Score
                 </div>
-                """,
-                unsafe_allow_html=True,
-            )
+                <div style="font-size: 3.5rem; font-weight: 800; color: {badge_color}; margin: 0.2rem 0;">
+                    {e_score} <span style="font-size: 1.5rem; color: #8b949e;">/ 100</span>
+                </div>
+                <div style="font-size: 1.25rem; font-weight: 600; color: #c9d1d9;">
+                    Assessment: <span style="color: {badge_color};">{verdict}</span>
+                </div>
+                <div style="font-size: 0.9rem; color: #8b949e; margin-top: 0.5rem;">
+                    {email_res['summary']}
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-            st.markdown("### 🧠 Psychological & Identity Flags")
-            if email_res["flags"]:
-                for idx, flag in enumerate(email_res["flags"], 1):
-                    sev = flag["severity"].lower()
+        st.markdown("### 🧠 Psychological & Identity Flags")
+        if email_res["flags"]:
+            for idx, flag in enumerate(email_res["flags"], 1):
+                sev = flag["severity"].lower()
+                st.markdown(
+                    f"""
+                    <div class="flag-card flag-{sev}">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                            <div>
+                                <strong style="color: #c9d1d9;">#{idx}. {flag['title']}</strong>
+                                <span class="badge badge-{sev}">{flag['severity']}</span>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #58a6ff;">
+                                {flag['category']} | +{flag['points']} pts
+                            </div>
+                        </div>
+                        <div style="font-size: 0.88rem; color: #8b949e;">
+                            {flag['description']}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.success("✅ No social engineering, urgency manipulation, or sender deception patterns found.")
+
+        if email_res["embedded_urls"]:
+            st.markdown("### 🔗 Links Discovered in Message Body")
+            st.caption("PhishGuard automatically extracted and scanned the destination links found in the text:")
+            for u_res in email_res["embedded_urls"]:
+                u_col1, u_col2 = st.columns([3, 1])
+                with u_col1:
+                    st.code(u_res["url"])
+                with u_col2:
+                    u_color = u_res["badge_color"]
                     st.markdown(
                         f"""
-                        <div class="flag-card flag-{sev}">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                                <div>
-                                    <strong style="color: #c9d1d9;">#{idx}. {flag['title']}</strong>
-                                    <span class="badge badge-{sev}">{flag['severity']}</span>
-                                </div>
-                                <div style="font-size: 0.8rem; color: #58a6ff;">
-                                    {flag['category']} | +{flag['points']} pts
-                                </div>
-                            </div>
-                            <div style="font-size: 0.88rem; color: #8b949e;">
-                                {flag['description']}
-                            </div>
+                        <div style="text-align: center; padding: 0.5rem; border-radius: 6px; background-color: #161b22; border: 1px solid {u_color};">
+                            <span style="font-weight: 700; color: {u_color};">{u_res['risk_level']}</span>
+                            <div style="font-size: 0.75rem; color: #8b949e;">Score: {u_res['score']}/100</div>
                         </div>
                         """,
                         unsafe_allow_html=True,
                     )
-            else:
-                st.success("✅ No social engineering, urgency manipulation, or sender deception patterns found.")
-
-            if email_res["embedded_urls"]:
-                st.markdown("### 🔗 Links Discovered in Message Body")
-                st.caption("PhishGuard automatically extracted and scanned the destination links found in the text:")
-                for u_res in email_res["embedded_urls"]:
-                    u_col1, u_col2 = st.columns([3, 1])
-                    with u_col1:
-                        st.code(u_res["url"])
-                    with u_col2:
-                        u_color = u_res["badge_color"]
-                        st.markdown(
-                            f"""
-                            <div style="text-align: center; padding: 0.5rem; border-radius: 6px; background-color: #161b22; border: 1px solid {u_color};">
-                                <span style="font-weight: 700; color: {u_color};">{u_res['risk_level']}</span>
-                                <div style="font-size: 0.75rem; color: #8b949e;">Score: {u_res['score']}/100</div>
-                            </div>
-                            """,
-                            unsafe_allow_html=True,
-                        )
+    else:
+        st.info("💡 Paste an email subject and body above, or click one of the pre-loaded attack scenarios to inspect.")
 
 
 # ==============================================================================
