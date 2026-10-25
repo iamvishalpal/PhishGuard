@@ -1,11 +1,11 @@
 # 🛡️ PhishGuard: Intelligent Phishing & Threat Intelligence Analysis Suite
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://phishguard-iamvp.streamlit.app/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/iamvishalpal/PhishGuard)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://www.python.org/)
-[![Status](https://img.shields.io/badge/Status-Live%20Online-success)](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)
+[![Status](https://img.shields.io/badge/Status-Live%20Online-success)](https://phishguard-iamvp.streamlit.app/)
 
-> 🌐 **Live Web Application:** [https://iamvishalpal-phishguard-app-hueeni.streamlit.app/](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)  
+> 🌐 **Live Web Application:** [https://phishguard-iamvp.streamlit.app/](https://phishguard-iamvp.streamlit.app/)  
 > Access and test the threat intelligence suite directly in your browser without local installation.
 
 **IBM SkillsBuild Cyber Security Bootcamp (October 2026) | Conducted by BharatCares**  
@@ -107,7 +107,7 @@ The engine evaluates visual character replacements (e.g. `0` $\rightarrow$ `o`, 
 
 ### 🌐 Option A: Instant Access (No Installation Required)
 You can directly use the deployed cloud application in your browser:  
-👉 **[Open Live PhishGuard Web App](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)**
+👉 **[Open Live PhishGuard Web App](https://phishguard-iamvp.streamlit.app/)**
 
 ---
 
@@ -201,7 +201,7 @@ PhishGuard/
 - **Email:** [vishalpal9868@gmail.com](mailto:vishalpal9868@gmail.com)  
 - **Program:** IBM SkillsBuild Cyber Security Bootcamp (October 2026)  
 - **Conducted by:** BharatCares  
-- **Live Demo:** [https://iamvishalpal-phishguard-app-hueeni.streamlit.app/](https://iamvishalpal-phishguard-app-hueeni.streamlit.app/)  
+- **Live Demo:** [https://iamvishalpal-phishguard-app-hueeni.streamlit.app/](https://phishguard-iamvp.streamlit.app/)  
 - **Project Category:** Defensive Cyber Operations & Threat Intelligence Suite  
 - **Submission:** Single Standalone Python File (`app.py`) + Full Academic Project Documentation
 
